@@ -12,12 +12,15 @@ import com.android.streammedia.tools.Utils;
 import com.android.streammedia.view.ActionMenu;
 import com.android.streammedia.view.MenuItem;
 import com.android.streammedia.view.MenuItemView;
+import com.android.streammedia.view.MenuView;
 
 public class MainActivity extends Activity implements View.OnClickListener{
 
     private ActionMenu mActionMenu;
 
     private LinearLayout mLayout;
+
+    private MenuView mMenuView;
 
     private Context mContext;
 
@@ -31,6 +34,12 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private void init(){
         mContext = this;
         mLayout  = (LinearLayout) findViewById(R.id.ly_main);
+        mMenuView = (MenuView) findViewById(R.id.munu_view);
+
+    }
+    private void initView(){
+        MenuItem item = new MenuItem(R.color.photo, R.mipmap.ic_messaging_posttype_photo, "Photo", R.color.text_color,this) ;
+        mMenuView.init(item);
     }
     /*private void initView(){
         mActionMenu = new ActionMenu.Builder(this)
@@ -46,13 +55,13 @@ public class MainActivity extends Activity implements View.OnClickListener{
         labelLp.gravity = Gravity.CENTER_HORIZONTAL;
         mLayout.addView(mActionMenu, labelLp);
     }*/
-    private void initView(){
+   /* private void initView(){
         MenuItem item = new MenuItem(R.color.photo, R.mipmap.ic_messaging_posttype_photo, "Photo", R.color.text_color,this) ;
         MenuItemView menuItemView = new MenuItemView(mContext, item);
         menuItemView.setLayoutParams(Utils.createWrapParams());
         menuItemView.setOnClickListener(item.getOnClickListener());
         mLayout.addView(menuItemView);
-    }
+    }*/
 
 
     @Override
