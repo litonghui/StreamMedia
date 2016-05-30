@@ -74,6 +74,10 @@ public class Utils {
     }
 
 
+    /**
+     * 获取当前时间
+     * @return
+     */
     @SuppressLint("SimpleDateFormat")
     public static  String getNowTime() {
         Date date = new Date(System.currentTimeMillis());
@@ -81,6 +85,12 @@ public class Utils {
         return dateFormat.format(date);
     }
 
+    /**
+     *  创建照片存储绝对路径
+     * @param filePath 文件路径
+     * @param fileName 照片名字
+     * @return 照片绝对路径
+     */
     public static File createOrOpen(String filePath,String fileName) {
         File dir = new File(filePath);
         if (!dir.exists()) {
@@ -129,6 +139,13 @@ public class Utils {
         return null;
     }
 
+    /**
+     * 压缩图片
+     * @param bitmap 原始图片
+     * @param width 宽度
+     * @param height 高度
+     * @return 压缩结果
+     */
     public static Bitmap zoomBitmap(Bitmap bitmap, int width, int height) {
         int w = bitmap.getWidth();
         int h = bitmap.getHeight();
