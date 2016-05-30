@@ -15,6 +15,7 @@ import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.streammedia.R;
 import com.android.streammedia.tools.Utils;
@@ -28,6 +29,9 @@ import java.io.IOException;
 public class LoadPhotoActivity extends Activity {
 
     public static final String ImageAvatarPath = "/sdcard/streammedia/";
+
+    private final static String EXTRA_RESTORE_PHOTO = "extra_restore_photo";
+
 
     public static final int PHOTO_REQUEST_TAKEPHOTO = 0;
 
@@ -43,6 +47,7 @@ public class LoadPhotoActivity extends Activity {
 
     private String mImageName;
 
+    private Activity mActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +57,7 @@ public class LoadPhotoActivity extends Activity {
     }
 
     private void init() {
+        mActivity = this;
         mImageView = (ImageView) findViewById(R.id.iv_photo);
         mCheckBox = (CheckBox) findViewById(R.id.check_crop);
         mImageView.setOnClickListener(new View.OnClickListener() {
@@ -75,13 +81,16 @@ public class LoadPhotoActivity extends Activity {
         tv_paizhao.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("SdCardPath")
             public void onClick(View v) {
-
-                mImageName = Utils.getNowTime() + ".png";
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                // 指定调用相机拍照后照片的储存路径
-                intent.putExtra(MediaStore.EXTRA_OUTPUT,
-                        Uri.fromFile(Utils.createOrOpen(ImageAvatarPath, mImageName)));
-                startActivityForResult(intent, PHOTO_REQUEST_TAKEPHOTO);
+                if (Utils.hasCamera(mActivity)) {
+                    mImageName = Utils.getNowTime() + ".png";
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    // 指定调用相机拍照后照片的储存路径
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                            Uri.fromFile(Utils.createOrOpen(ImageAvatarPath, mImageName)));
+                    startActivityForResult(intent, PHOTO_REQUEST_TAKEPHOTO);
+                } else {
+                    Toast.makeText(mActivity, "No Find Camera !", Toast.LENGTH_SHORT).show();
+                }
                 dlg.cancel();
             }
         });
@@ -175,5 +184,19 @@ public class LoadPhotoActivity extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mImageName != null) {
+            outState.putSerializable(EXTRA_RESTORE_PHOTO, mImageName);
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mImageName = (String) savedInstanceState.getSerializable(EXTRA_RESTORE_PHOTO);
     }
 }

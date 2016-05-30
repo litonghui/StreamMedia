@@ -1,11 +1,18 @@
 package com.android.streammedia.tools;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.os.Environment;
+import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -17,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by litonghui on 2016/4/27.
@@ -129,6 +137,77 @@ public class Utils {
         float scaleHeight = ((float) height / h);
         matrix.postScale(scaleWidth, scaleHeight);
         Bitmap newbmp = Bitmap.createBitmap(bitmap, 0, 0, w, h, matrix, true);
+        if (null != bitmap && !bitmap.isRecycled()) {
+            bitmap.recycle();
+        }
         return newbmp;
     }
+
+    /**
+     * 判断系统是否可以启动相机
+     * @return
+     */
+    public static boolean hasCamera(Activity activity) {
+        if (null != activity && !activity.isFinishing()) {
+            PackageManager packageManager = activity.getPackageManager();
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            List<ResolveInfo> infos = packageManager.queryIntentActivities(
+                    intent, PackageManager.MATCH_DEFAULT_ONLY);
+            return infos != null ? infos.size() > 0 : false;
+        } else
+            return false;
+    }
+
+    /**
+     * 获取图片旋转角度
+     * @param path 图片存储绝对路径
+     * @return 图片旋转角度
+     */
+    public static int getBitmapDefree(String path) {
+        if (TextUtils.isEmpty(path))
+            return 0;
+        int degree = 0;
+        try {
+            ExifInterface exifInterface = new ExifInterface(path);
+            int orientation = exifInterface.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    degree = 90;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    degree = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    degree = 270;
+                    break;
+                default:
+                    break;
+            }
+        } catch (Exception e) {
+
+        }
+        return degree;
+    }
+
+    /**
+     * 将图片按照指定角度旋转
+     * @param bitmap 需要旋转图片
+     * @param degree 旋转度数
+     * @return 旋转后的图片
+     */
+    public static Bitmap rotateBitmapByDegree(Bitmap bitmap , int degree) {
+        //根据选择角度，生成旋转矩阵
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
+                bitmap.getHeight(), matrix, true);
+        if (null != bitmap && !bitmap.isRecycled()) {
+            bitmap.recycle();
+        }
+        return newBitmap;
+    }
+
+
+
 }
